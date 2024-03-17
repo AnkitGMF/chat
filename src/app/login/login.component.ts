@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
+import { ChatRoomService } from '../chat-room.service';
 
 @Component({
   selector: 'app-login',
@@ -17,23 +18,25 @@ export class LoginComponent {
 
   errorMessage = '';
 
-  constructor(private authService: AuthService,private router:Router){}
+  constructor(private authService: AuthService,private router:Router,private chatService:ChatRoomService){}
 
   onSubmit() {
     this.authService.loginUser(this.loginForm.value.username,this.loginForm.value.password).subscribe({
       next:(data)=>{
-        console.log('Login successful');
         this.authService.setToken(data.token);
+        this.authService.me = data.user;
         this.errorMessage='';
+        console.log(this.loginForm.value.username)
+        this.chatService.socket.emit('loggedIn',this.authService.me);
         this.router.navigate(['/chat']);
+        this.loginForm.setValue({
+          username: '',
+          password: ''
+        });
       },
       error: error => this.errorMessage = error.error.message
     });
 
-    this.loginForm.setValue({
-      username: '',
-      password: ''
-    });
   }
 
 }

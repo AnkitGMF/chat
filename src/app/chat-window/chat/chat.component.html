@@ -1,3 +1,3 @@
 <div *ngFor="let message of messages" class="flex flex-col overflow-auto">
-    <app-message [direction]="message.from==='John'?'left':'right'" [message]="message"></app-message>
+    <app-message [direction]="message.sender==me?'right':'left'" [message]="message"></app-message>
 </div>

@@ -15,6 +15,7 @@ import { SignupComponent } from './signup/signup.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { AuthInterceptor } from './auth.interceptor';
+import { NewChatModalComponent } from './new-chat-modal/new-chat-modal.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import { AuthInterceptor } from './auth.interceptor';
     MainChatComponent,
     LoginComponent,
     SignupComponent,
+    NewChatModalComponent,
   ],
   imports: [BrowserModule, AppRoutingModule,ReactiveFormsModule,HttpClientModule],
   providers: [

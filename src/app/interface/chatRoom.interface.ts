@@ -1,5 +1,4 @@
 export interface ChatRoom {
-    id: string;
+    chatRoomId: string;
     name: string;
-    lastMessageTime: string;
 }

@@ -22,11 +22,10 @@ export class SignupComponent {
   onSubmit() {
     if(this.signupForm.value.password === this.signupForm.value.confirmPassword){
       this.authService.registerUser(this.signupForm.value.username,this.signupForm.value.password).subscribe({
-        next: data => console.log(data),
         error: error => this.errorMessage = error.error.message
       });
     } else {
-      console.log('Passwords do not match');
+      this.errorMessage = 'Passwords do not match';
     }
 
     this.signupForm.setValue({

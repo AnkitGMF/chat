@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable,Inject } from '@angular/core';
 import { LocalStorageToken } from './localstorage.token';
 import { AuthServerResponse } from './interface/auth.interface';
+import { User } from './interface/user.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -9,6 +10,12 @@ import { AuthServerResponse } from './interface/auth.interface';
 export class AuthService {
 
   constructor(private http:HttpClient, @Inject(LocalStorageToken) private localStorage:any) { }
+
+  me!:User;
+
+  getExistingChatRooms(){
+    return this.me.chatRooms;
+  }
 
   registerUser(username:string|null|undefined,password:string|null|undefined){
     return this.http.post<AuthServerResponse>('/api/auth/register',{username,password});
@@ -23,7 +30,11 @@ export class AuthService {
   }
 
   loginUser(username:string|null|undefined,password:string|null|undefined){
-    return this.http.post<AuthServerResponse>('/api/auth/login',{username,password});
+    return this.http.post<{success:boolean,token:string,user:User}>('/api/auth/login',{username,password});
+  }
+
+  getUser(){
+    return this.http.get<{success:boolean,user:User,message:string}>('/api/auth/user');
   }
 
   isLoggedIn(){

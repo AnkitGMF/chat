@@ -1,6 +1,9 @@
 <div class="h-full flex flex-col bg-accent">
-    <button class="m-2 bg-green-500 p-2 rounded-md">New Chat</button>
+    <button (click)="openModal()" class="m-2 bg-green-500 p-2 rounded-md">New Chat</button>
+    <div *ngIf="modalId">
+        <app-new-chat-modal (close)="closeModal()"></app-new-chat-modal>
+    </div>
     <div *ngFor="let room of chatRooms" class="flex flex-col">
-        <app-chat-room [room]="room"></app-chat-room>
+        <app-chat-room (click)="selectRoom(room.chatRoomId)" [room]="room"></app-chat-room>
     </div>
 </div>
