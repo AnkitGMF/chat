@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-signup',
@@ -7,24 +8,29 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
   styleUrl: './signup.component.css'
 })
 export class SignupComponent {
+
+  errorMessage = '';
+
   signupForm = new FormGroup({
-    email: new FormControl('', [Validators.required, Validators.email]),
+    username: new FormControl('', [Validators.required, Validators.minLength(2)]),
     password: new FormControl('', [Validators.required, Validators.minLength(6)]),
     confirmPassword: new FormControl('', [Validators.required, Validators.minLength(6)]),
   });
 
-  ngOnChange() {
-    Object.keys(this.signupForm.controls).forEach(key => {
-      // Get errors of every form control
-      //@ts-ignore
-      console.log(this.signupForm.get(key).errors);
-    })
-  }
+  constructor(private authService:AuthService){}
 
   onSubmit() {
-    console.log(this.signupForm);
+    if(this.signupForm.value.password === this.signupForm.value.confirmPassword){
+      this.authService.registerUser(this.signupForm.value.username,this.signupForm.value.password).subscribe({
+        next: data => console.log(data),
+        error: error => this.errorMessage = error.error.message
+      });
+    } else {
+      console.log('Passwords do not match');
+    }
+
     this.signupForm.setValue({
-      email: '',
+      username: '',
       password: '',
       confirmPassword: ''
     });
