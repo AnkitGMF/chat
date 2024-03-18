@@ -11,8 +11,9 @@ import { AuthService } from '../../auth.service';
 export class ChatComponent {
   messages!: Message[] | undefined;
   messageMap = new Map<string, Message[]>();
-  skipMap = new Map<string, number>();
+  prevDataLoaded = new Map<string,boolean>();
   me!: string;
+  isScrollable = true;
 
   @ViewChild('chat', { static: true }) chat!: ElementRef;
 
@@ -21,9 +22,24 @@ export class ChatComponent {
     private authService: AuthService
   ) {}
 
-  // ngAfterViewInit(){
-  //   this.chat.nativeElement.scrollTo(0, this.chat.nativeElement.scrollHeight);
-  // }
+
+  loadPreviousMessages(chatRoomId:string){
+    this.chatRoomService.loadExistingMessages(chatRoomId).subscribe({
+      next: (data)=>{
+        console.log(data);
+        this.prevDataLoaded.set(chatRoomId,true);
+
+        if(!this.messageMap.has(chatRoomId)){
+          this.messageMap.set(chatRoomId,[])
+        }
+
+        //@ts-ignore
+        this.messageMap.set(this.chatRoomService.currRoom,data.messages.concat(this.messageMap.get(this.chatRoomService.currRoom)))
+        this.messages = this.messageMap.get(this.chatRoomService.currRoom);
+        this.chat.nativeElement.scrollTop = this.chat.nativeElement.scrollHeight
+      }
+    })
+  }
 
   ngOnInit() {
     console.log(this.chat.nativeElement);
@@ -35,9 +51,6 @@ export class ChatComponent {
         } else {
           this.messageMap.set(data.chatRoomId, [data]);
         }
-        if(data.chatRoomId===this.chatRoomService.currRoom){
-          // this.chat.nativeElement.scrollTop = this.chat.nativeElement.scrollHeight;
-        }
       },
     });
 
@@ -45,13 +58,17 @@ export class ChatComponent {
       next: (data) => {
         if (this.messageMap.has(data)) {
           this.messages = this.messageMap.get(data);
-          // this.chat.nativeElement.scrollTop = this.chat.nativeElement.scrollHeight;
         } else {
           this.messageMap.set(data, []);
           this.messages = this.messageMap.get(data);
-          // this.chat.nativeElement.scrollTop = this.chat.nativeElement.scrollHeight;
         }
+
+        if(!this.prevDataLoaded.get(data)){
+          this.loadPreviousMessages(data)
+        }
+
         console.log(this.messages);
+
       },
       error: (error) => {
         console.log(error);
@@ -59,7 +76,21 @@ export class ChatComponent {
     });
   }
 
+
   scrollNow(){
-    this.chat.nativeElement.scrollTop = this.chat.nativeElement.scrollHeight;
+    if(this.isScrollable){
+      this.chat.nativeElement.scrollTop = this.chat.nativeElement.scrollHeight;
+    }
+  }
+
+  onScroll(event:Event){
+
+    if(this.chat.nativeElement.scrollTop+this.chat.nativeElement.clientHeight!=this.chat.nativeElement.scrollHeight){
+      this.isScrollable = false;
+    }
+    else{
+      this.isScrollable = true;
+    }
+
   }
 }

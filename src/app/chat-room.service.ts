@@ -78,8 +78,8 @@ export class ChatRoomService {
     return observable;
   }
 
-  loadExistingMessages(chatRoomId:string,skip:number){
-    return this.http.post<Message[]>(`/api/message`,{chatRoomId,skip});
+  loadExistingMessages(chatRoomId:string){
+    return this.http.post<Message[]>(`/api/message`,{chatRoomId});
   }
 
 }

@@ -1,4 +1,4 @@
-<div #chat class="overflow-y-auto h-[calc(100vh-9rem)]">
+<div (scroll)="onScroll($event)" #chat class="overflow-y-auto h-[calc(100vh-9rem)]">
     <div *ngFor="let message of messages" class="flex flex-col">
         <app-message (scrollNow)="scrollNow()" [direction]="message.sender==me?'right':'left'" [message]="message"></app-message>
     </div>
