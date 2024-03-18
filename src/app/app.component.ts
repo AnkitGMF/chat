@@ -16,6 +16,7 @@ export class AppComponent {
   ) {}
 
   ngOnInit() {
+    this.chatRoomService.selectRoom('')
     if (this.authService.getToken()) {
       this.authService.getUser().subscribe({
         next: (data) => {

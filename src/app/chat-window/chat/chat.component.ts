@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, SimpleChange, ViewChild } from '@angular/core';
 import { ChatRoomService } from '../../chat-room.service';
 import { Message } from '../../interface/message.interface';
 import { AuthService } from '../../auth.service';
@@ -12,13 +12,22 @@ export class ChatComponent {
   messages!: Message[] | undefined;
   messageMap = new Map<string, Message[]>();
   skipMap = new Map<string, number>();
-  me!:string;
+  me!: string;
 
-  constructor(private chatRoomService: ChatRoomService,private authService:AuthService) {}
+  @ViewChild('chat', { static: true }) chat!: ElementRef;
+
+  constructor(
+    private chatRoomService: ChatRoomService,
+    private authService: AuthService
+  ) {}
+
+  // ngAfterViewInit(){
+  //   this.chat.nativeElement.scrollTo(0, this.chat.nativeElement.scrollHeight);
+  // }
 
   ngOnInit() {
+    console.log(this.chat.nativeElement);
     this.me = this.authService.me.username;
-
     this.chatRoomService.getMessages().subscribe({
       next: (data) => {
         if (this.messageMap.has(data.chatRoomId)) {
@@ -26,20 +35,31 @@ export class ChatComponent {
         } else {
           this.messageMap.set(data.chatRoomId, [data]);
         }
+        if(data.chatRoomId===this.chatRoomService.currRoom){
+          // this.chat.nativeElement.scrollTop = this.chat.nativeElement.scrollHeight;
+        }
       },
     });
 
     this.chatRoomService.roomState.subscribe({
       next: (data) => {
-        if(this.messageMap.has(data)){
+        if (this.messageMap.has(data)) {
           this.messages = this.messageMap.get(data);
-        }
-        else{
-          this.messageMap.set(data,[]);
+          // this.chat.nativeElement.scrollTop = this.chat.nativeElement.scrollHeight;
+        } else {
+          this.messageMap.set(data, []);
           this.messages = this.messageMap.get(data);
+          // this.chat.nativeElement.scrollTop = this.chat.nativeElement.scrollHeight;
         }
         console.log(this.messages);
       },
+      error: (error) => {
+        console.log(error);
+      },
     });
+  }
+
+  scrollNow(){
+    this.chat.nativeElement.scrollTop = this.chat.nativeElement.scrollHeight;
   }
 }
